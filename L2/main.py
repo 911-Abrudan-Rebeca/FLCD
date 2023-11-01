@@ -1,7 +1,5 @@
 from Scanner import Scanner
 
-
-
 def run(file_path):
     scanner = Scanner(file_path)
     scanner.scan()
@@ -14,12 +12,12 @@ def run(file_path):
     constST = scanner.get_constantST().toString()
     idST = scanner.get_identifiersST().toString()
     with open(file_path + ".tables.txt", 'w') as file:
-        file.write("Constants table starts here:" + '\n')
+        file.write("Constants table:" + '\n')
     with open(file_path+".tables.txt", 'a') as file:
         for element in constST:
             file.write(str(element) + '\n')
     with open(file_path + ".tables.txt", 'a') as file:
-        file.write("Identifiers table starts here:" + '\n')
+        file.write('\n' + "Identifiers table:" + '\n')
     with open(file_path+".tables.txt", 'a') as file:
         for element in idST:
             file.write(str(element) + '\n')

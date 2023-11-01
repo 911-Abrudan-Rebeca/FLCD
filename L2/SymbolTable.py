@@ -17,7 +17,7 @@ class HashTable:
         :param capacity: The initial capacity of the hash table.
         """
         self.capacity = capacity
-        self.size = 0
+        self.size = 1
         self.table = [None] * capacity
 
     def toString(self):

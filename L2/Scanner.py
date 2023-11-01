@@ -16,12 +16,11 @@ class Scanner:
         self.constantST = ConstantsSymbolTable(200)
         self.identifiersST = IdentifiersSymbolTable(200)
         self.pifOutput = []
-
         self.filePath = filepath
 
     def readFile(self):
         """
-        Reads the content of the source code file specified by the `filePath` and returns it as a single string.
+        Reads the content of the source code file line by line and returns it as a single string.
         :return: A single string containing the content of the source code file.
         """
         fileContent = ""
@@ -40,25 +39,27 @@ class Scanner:
         try:
             content = self.readFile()
             tokens = []
-            local_word = ""  # temporary string (characters into words)
+            local_word = ""  # temporary string
             in_quoted_string = False  # part of "" or no
 
-            # Process content character by character
+            # iterates character by character
             for char in content:
                 if in_quoted_string:
                     local_word += char
                     if char == '"':
                         in_quoted_string = False
+
                 elif char not in self.operators and char not in self.separators:
                     local_word += char  # If char is not in the operators or separators, we add it to form the word
-                else:  # if operator or separator => end of current word
+
+                else:  # if operator or separator => end of current token
                     if local_word:
                         tokens.append(local_word)  # add to tokens
-                        local_word = ""
-                    if char == '"':
+                        local_word = ""  # reset to empty
+                    if char == '"':  # start of str
                         local_word = '"'
                         in_quoted_string = True
-                    elif char.strip() or char in self.operators or char in self.separators:  # empty local_word, or space
+                    elif char.strip() or char in self.operators or char in self.separators:  # empty local_word, or space, or operator, or separator
                         tokens.append(char)
 
             # (if exists) add remaining word
@@ -80,20 +81,17 @@ class Scanner:
         """
         tokens = self.getProgramTokens()  # list of tokens
         counter = 0
-        lexical_error_exists = False  # flag to trak lexical errors
+        lexical_error_exists = False  # flag to track lexical errors
         identifier_positions = {}  # dictionary to store positions of identifiers
         constant_positions = {}  # dictionary to store positions of constants
-        identifier_counter = self.identifiersST.__len__()  # current count
-        constant_counter = self.constantST.__len__()
+        identifier_counter = 0 # current count
+        constant_counter = 0
 
         if tokens is None:
             return
 
         for t in tokens:
             token = t
-
-            if token == "\n":  # line number
-                counter += 1
 
             if token in self.reservedWords:
                 self.pifOutput.append([token, -1])
@@ -106,7 +104,7 @@ class Scanner:
                 if token not in identifier_positions:
                     identifier_counter += 1
                     identifier_positions[token] = identifier_counter
-                    if self.identifiersST.search(token) == -2:
+                    if self.identifiersST.search(token) == -2:  # not in symbol table
                         self.identifiersST.insert(token, self.identifiersST.__len__())
                 self.pifOutput.append(['IDENTIFIER', identifier_positions[token]])
             elif re.match(r'^(0|[-+]?[1-9][0-9]*|\'[1-9]\'|\'[a-zA-Z]\'|\"[0-9]*[a-zA-Z ]*\"|".*\s*")$',token):  # Check for valid constant
@@ -121,8 +119,15 @@ class Scanner:
                 print(f"Invalid token: {token} on line {counter}")
                 lexical_error_exists = True
 
+            if token == "\n":  # line number
+                counter += 1
+
         if not lexical_error_exists:
             print("Program is lexically correct!")
+
+
+
+
 
 
     def find_token_index(self, target_token):
