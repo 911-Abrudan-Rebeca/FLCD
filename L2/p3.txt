@@ -1,0 +1,16 @@
+var
+ n: int;
+ sum: int;
+ i: int;
+ a: int;
+{
+ read(n);
+ sum = 0;
+ i = 1;
+ while (i <= n) {
+ read(a);
+ sum = sum + a;
+ i = i + 1;
+ }
+ print(sum);
+}

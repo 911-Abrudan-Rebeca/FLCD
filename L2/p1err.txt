@@ -1,0 +1,6 @@
+v@r
+ identifier: int;
+{
+ read(identifier);
+ print(“Hello, World!);
+}

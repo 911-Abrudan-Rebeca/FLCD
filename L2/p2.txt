@@ -1,0 +1,24 @@
+var
+ a: int;
+ prim: int;
+ i: int;
+{
+ read(a);
+ prim = 1;
+ if (a <= 1) {
+ prim = 0;
+ } else {
+ i = 2;
+ while (i * i <= a) {
+ if (a % i == 0) {
+ prim = 0;
+ }
+ i = i + 1;
+ }
+ }
+ if (prim == 1) {
+ print("Prime");
+ } else {
+ print("Not Prime");
+ }
+}
