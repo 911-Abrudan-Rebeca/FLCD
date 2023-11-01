@@ -96,16 +96,18 @@ class Scanner:
                 counter += 1
 
             if token in self.reservedWords:
-                self.pifOutput.append([-1, token])
+                self.pifOutput.append([token, -1])
             elif token in self.operators:
-                self.pifOutput.append([-1, token])
+                self.pifOutput.append([token, -1])
             elif token in self.separators:
-                self.pifOutput.append([-1, token])
+                self.pifOutput.append([token, -1])
 
             elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', token):  # Check for valid identifier
                 if token not in identifier_positions:
                     identifier_counter += 1
                     identifier_positions[token] = identifier_counter
+                    if self.identifiersST.search(token) == -2:
+                        self.identifiersST.insert(token, self.identifiersST.__len__())
                 self.pifOutput.append(['IDENTIFIER', identifier_positions[token]])
             elif re.match(r'^(0|[-+]?[1-9][0-9]*|\'[1-9]\'|\'[a-zA-Z]\'|\"[0-9]*[a-zA-Z ]*\"|".*\s*")$',token):  # Check for valid constant
                 if token not in constant_positions:
