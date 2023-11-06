@@ -6,11 +6,12 @@ var
 {
  read(n);
  sum = 0;
- i = 1;
+ i = -1 - 2;
  while (i <= n) {
  read(a);
  sum = sum + a;
  i = i + 1;
  }
  print(sum);
+ print("good");
 }

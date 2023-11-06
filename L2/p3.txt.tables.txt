@@ -1,0 +1,12 @@
+Constants table:
+2: 3
+1: 4
+"good": 5
+-1: 2
+0: 1
+
+Identifiers table:
+i: 3
+n: 1
+sum: 2
+a: 4
