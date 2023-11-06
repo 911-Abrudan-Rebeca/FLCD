@@ -105,7 +105,7 @@ class Scanner:
                 index = self.identifiersST.search(token)
                 if index == -2:  # Identifier not in the symbol table
                     identifier_counter += 1  # Increment the identifier counter
-                    index = identifier_counter  # Use the identifier counter as the index
+                    index = identifier_counter
                     self.identifiersST.insert(token, index)  # Insert the identifier into the symbol table
                 self.pifOutput.append(['IDENTIFIER', index])
             elif re.match(r'^(0|[-+]?[1-9][0-9]*|\'[1-9]\'|\'[a-zA-Z]\'|\"[0-9]*[a-zA-Z ]*\"|".*\s*")$',token):  # Check for valid constant
@@ -119,28 +119,8 @@ class Scanner:
                 print(f"Invalid token: {token} on line {counter}")
                 lexical_error_exists = True
 
-
-
         if not lexical_error_exists:
             print("Program is lexically correct!")
-
-
-
-
-
-
-    def find_token_index(self, target_token):
-        """
-        Find the index of a target_token in 'token.in' file.
-        :param target_token: The token to find in 'token.in'.
-        :return: The index of the target_token if found; otherwise, None.
-        """
-        with open('token.in', 'r') as file:
-            for line in file:
-                line = line.strip()
-                if target_token in line:
-                    index = line.split()
-                    return index[0]
 
     def get_pif(self):
         """
@@ -154,4 +134,3 @@ class Scanner:
 
     def get_identifiersST(self):
         return self.identifiersST
-
