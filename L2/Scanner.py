@@ -11,7 +11,7 @@ class Scanner:
         :param filepath: The path to the source code file to be analyzed.
         """
         self.operators = ["+", "-", "*", "/", "==", "<=", ">=", "!=", "<", ">", "=","%"]
-        self.separators = ["(", ")", "{", "}", ",", ";", ":", " ", "\n", "\""]
+        self.separators = ["(", ")", "{", "}", ",", ";", ":", " ", "\"", "\n"]
         self.reservedWords = ["var", "int", "str", "read", "print", "if", "else", "do", "while"]
         self.constantST = ConstantsSymbolTable(200)
         self.identifiersST = IdentifiersSymbolTable(200)
@@ -21,7 +21,7 @@ class Scanner:
     def readFile(self):
         """
         Reads the content of the source code file line by line and returns it as a single string.
-        :return: A single string containing the content of the source code file.
+        :return: A string containing the content of the source code file.
         """
         fileContent = ""
 
@@ -49,7 +49,7 @@ class Scanner:
                     if char == '"':
                         in_quoted_string = False
 
-                elif char not in self.operators and char not in self.separators:
+                elif char not in self.operators and char not in self.separators and char not in self.reservedWords:
                     local_word += char  # If char is not in the operators or separators, we add it to form the word
 
                 else:  # if operator or separator => end of current token
@@ -59,7 +59,7 @@ class Scanner:
                     if char == '"':  # start of str
                         local_word = '"'
                         in_quoted_string = True
-                    elif char.strip() or char in self.operators or char in self.separators:  # empty local_word, or space, or operator, or separator
+                    elif char.strip() or char in self.operators or char in self.separators or char in self.reservedWords:  # empty local_word, or space, or operator, or separator
                         tokens.append(char)
 
             # (if exists) add remaining word
@@ -81,9 +81,7 @@ class Scanner:
         """
         tokens = self.getProgramTokens()  # list of tokens
         counter = 0
-        lexical_error_exists = False  # flag to track lexical errors
-        identifier_positions = {}  # dictionary to store positions of identifiers
-        constant_positions = {}  # dictionary to store positions of constants
+        lexical_error_exists = False  # track lexical errors
         identifier_counter = 0 # current count
         constant_counter = 0
 
@@ -93,7 +91,10 @@ class Scanner:
         for t in tokens:
             token = t
 
-            if token in self.reservedWords:
+            if token == "\n":  # line number
+                counter += 1
+
+            elif token in self.reservedWords:
                 self.pifOutput.append([token, -1])
             elif token in self.operators:
                 self.pifOutput.append([token, -1])
@@ -101,26 +102,24 @@ class Scanner:
                 self.pifOutput.append([token, -1])
 
             elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', token):  # Check for valid identifier
-                if token not in identifier_positions:
-                    identifier_counter += 1
-                    identifier_positions[token] = identifier_counter
-                    if self.identifiersST.search(token) == -2:  # not in symbol table
-                        self.identifiersST.insert(token, self.identifiersST.__len__())
-                self.pifOutput.append(['IDENTIFIER', identifier_positions[token]])
+                index = self.identifiersST.search(token)
+                if index == -2:  # Identifier not in the symbol table
+                    identifier_counter += 1  # Increment the identifier counter
+                    index = identifier_counter  # Use the identifier counter as the index
+                    self.identifiersST.insert(token, index)  # Insert the identifier into the symbol table
+                self.pifOutput.append(['IDENTIFIER', index])
             elif re.match(r'^(0|[-+]?[1-9][0-9]*|\'[1-9]\'|\'[a-zA-Z]\'|\"[0-9]*[a-zA-Z ]*\"|".*\s*")$',token):  # Check for valid constant
-                if token not in constant_positions:
+                index = self.constantST.search(token)
+                if index == -2:
                     constant_counter += 1
-                    constant_positions[token] = constant_counter
-                    if self.constantST.search(token) == -2:  # not in the symbol table
-                        self.constantST.insert(token, self.constantST.__len__())
-                self.pifOutput.append(['CONSTANT', constant_positions[token]])
-
+                    index = constant_counter
+                    self.constantST.insert(token, index)
+                self.pifOutput.append(['CONSTANT', index])
             else:
                 print(f"Invalid token: {token} on line {counter}")
                 lexical_error_exists = True
 
-            if token == "\n":  # line number
-                counter += 1
+
 
         if not lexical_error_exists:
             print("Program is lexically correct!")
