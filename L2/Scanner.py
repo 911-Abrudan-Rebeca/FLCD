@@ -10,6 +10,7 @@ class Scanner:
         variables to be used during lexical analysis.
         :param filepath: The path to the source code file to be analyzed.
         """
+        self.multi_char_operators = ["<=", ">=", "!=", "=="]
         self.operators = ["+", "-", "*", "/", "==", "<=", ">=", "!=", "<", ">", "=","%"]
         self.separators = ["(", ")", "{", "}", ",", ";", ":", " ", "\"", "\n"]
         self.reservedWords = ["var", "int", "str", "read", "print", "if", "else", "do", "while"]
@@ -31,6 +32,7 @@ class Scanner:
 
         return fileContent
 
+
     def getProgramTokens(self):
         """
         Takes the source code, identifies and extracts individual tokens (keywords, identifiers, operators, constants, and separators)
@@ -43,26 +45,69 @@ class Scanner:
             in_quoted_string = False  # part of "" or no
 
             # iterates character by character
-            for char in content:
+            # for char in content:
+            #     if in_quoted_string:
+            #         local_word += char
+            #         if char == '"':
+            #             in_quoted_string = False
+            #
+            #     elif char not in self.operators and char not in self.separators and char not in self.reservedWords:
+            #         local_word += char  # If char is not in the operators or separators, we add it to form the word
+            #
+            #     else:  # if operator or separator => end of current token
+            #         if local_word:
+            #             tokens.append(local_word)  # add to tokens
+            #             local_word = ""  # reset to empty
+            #         if char == '"':  # start of str
+            #             local_word = '"'
+            #             in_quoted_string = True
+            #         elif char.strip() or char in self.operators or char in self.separators or char in self.reservedWords:  # empty local_word, or space, or operator, or separator
+            #             tokens.append(char)
+            #
+            # # (if exists) add remaining word
+            # if local_word:
+            #     tokens.append(local_word)
+            #
+            # return tokens
+
+            i = 0
+            while i < len(content):
+                char = content[i]
+
                 if in_quoted_string:
                     local_word += char
                     if char == '"':
                         in_quoted_string = False
+                    i += 1
+                else:
+                    # Check for multi-character operators first
+                    operator_found = False
+                    for op in self.multi_char_operators:
+                        op_len = len(op)
+                        if content[i:i + op_len] == op: # from i to i+operator length
+                            tokens.append(op)
+                            operator_found = True
+                            i += op_len
+                            break
 
-                elif char not in self.operators and char not in self.separators and char not in self.reservedWords:
-                    local_word += char  # If char is not in the operators or separators, we add it to form the word
+                    if operator_found:
+                        continue
 
-                else:  # if operator or separator => end of current token
-                    if local_word:
-                        tokens.append(local_word)  # add to tokens
-                        local_word = ""  # reset to empty
-                    if char == '"':  # start of str
-                        local_word = '"'
-                        in_quoted_string = True
-                    elif char.strip() or char in self.operators or char in self.separators or char in self.reservedWords:  # empty local_word, or space, or operator, or separator
-                        tokens.append(char)
+                    if char not in self.separators and char not in self.reservedWords:
+                        local_word += char  # If char is not in the separators or reserved words, we add it to form the word
+                        i += 1
+                    else:
+                        if local_word:
+                            tokens.append(local_word)  # add to tokens
+                            local_word = ""  # reset to empty
+                        if char == '"':  # start of a string
+                            local_word = '"'
+                            in_quoted_string = True
+                        elif char.strip() or char in self.operators or char in self.separators or char in self.reservedWords:  # empty local_word, or space, or operator, or separator
+                            tokens.append(char)
+                        i += 1
 
-            # (if exists) add remaining word
+            # (if exists) add the remaining word
             if local_word:
                 tokens.append(local_word)
 
@@ -93,7 +138,8 @@ class Scanner:
 
             if token == "\n":  # line number
                 counter += 1
-
+            elif token == " ":
+                continue
             elif token in self.reservedWords:
                 self.pifOutput.append([token, -1])
             elif token in self.operators:
@@ -121,6 +167,8 @@ class Scanner:
 
         if not lexical_error_exists:
             print("Program is lexically correct!")
+
+
 
     def get_pif(self):
         """
