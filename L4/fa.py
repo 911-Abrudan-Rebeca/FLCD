@@ -44,13 +44,13 @@ class FiniteAutomata:
 
     def menu(self):
         print("Please choose what you want to output:")
-        print("Type <0> to exit")
-        print("Type <1> to output the set of states")
-        print("Type <2> to output the alphabet")
-        print("Type <3> to output the transitions")
-        print("Type <4> to output the initial state")
-        print("Type <5> to output the set of final states")
-        print("Type <6> to test if a sequence is accepted by the FA")
+        print("Type 0 to exit")
+        print("Type 1 to output the set of states")
+        print("Type 2 to output the alphabet")
+        print("Type 3 to output the transitions")
+        print("Type 4 to output the initial state")
+        print("Type 5 to output the set of final states")
+        print("Type 6 to test if a sequence is accepted by the FA")
 
     def print_states(self):
         print(" ".join(self.states))
