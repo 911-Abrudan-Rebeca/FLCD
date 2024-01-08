@@ -13,10 +13,11 @@ DIGIT [0-9]
 NON_ZERO_DIGIT [1-9]
 INT_CONSTANT [+-]?{NON_ZERO_DIGIT}{DIGIT}*|0
 LETTER [a-zA-Z_]
-SPECIAL_CHAR [ ?:*\^+=.!]
+SPECIAL_CHAR [ _]
 STRING_CONSTANT (\"({LETTER}|{DIGIT}|{SPECIAL_CHAR})*\")
 IDENTIFIER {LETTER}({LETTER}|{DIGIT})*
 BAD_IDENTIFIER ({DIGIT})+({LETTER})+({LETTER}|{DIGIT})*
+BAD_CONST [+-]0|0{NON_ZERO_DIGIT}{DIGIT}*
 
 %%
 
@@ -26,9 +27,13 @@ BAD_IDENTIFIER ({DIGIT})+({LETTER})+({LETTER}|{DIGIT})*
 
 {IDENTIFIER} {printf("%s - identifier\n", yytext);}
 
-{BAD_IDENTIFIER} {printf("Error at token %s at line %d\n", yytext, lines); exit(1);}
+{BAD_IDENTIFIER} {printf("bad identifier at token %s at line %d \n", yytext, lines); exit(1);}
+
 
 {INT_CONSTANT} {printf("%s - integer constant\n", yytext);}
+
+{BAD_CONST} {printf("bad constant at token %s at line %d \n", yytext, lines); exit(1);}
+
 
 {STRING_CONSTANT} {printf("%s - string constant\n", yytext);}
 
